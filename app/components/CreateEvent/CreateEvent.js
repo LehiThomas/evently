@@ -6,18 +6,67 @@ export default class CreateEvent extends Component {
     constructor() {
         super();
         this.state={
-            titleValue: ""
+            title: "",
+	        slots: 0,
+	        startTime: 0,
+	        tags: [],
+	        owner: "",
+	        id: 0
         };
     }
 
-    onChangeText(value){
+    onChangeValue(value){
         this.setState({
             textValue:value
         });
     }
 
+    createTags(tagsString){
+		let tagsArray = [];
+		tagsArray = tagsString.split(",");
+		tagsArray = this.trimTags(tagsArray);
+		return tagsArray;
+    }
+    
+    trimTags(tagsArray){
+		let trimmedTags = [];
+		tagsArray.map( (tag) => { trimmedTags.push(tag.trim().toLowerCase()); });
+		return trimmedTags;
+	}
+
     onSubmit(){
         console.log("Submitted");
+        const { navigate } = this.props.navigation;
+        const config = {
+            headers: {'Content-Type': 'application/json'}
+          };
+        axios.post(`${URL_API}/events`, {
+                    "title": this.state.title,
+                    "slots": this.state.slots,
+                    "startTime": this.state.startTime,
+                    "participants": [],
+                    "tags": this.state.tags,
+                    "owner": {
+                        "id": this.state.owner.toUpperCase(), 
+                      "name": this.state.owner
+                    }
+          }, config )
+          .then( response => {
+              console.log(response);
+              this.setState({ id: response.data._id });
+          })
+          .catch( error => {
+              console.log('ERROR:', error.response);
+              // error message
+        });
+
+        navigate('Events');
+    }
+
+    onSubmitTag(tag){
+        this.setState({
+	        tags: this.state.tags.push(tag)
+	    });
     }
 
     static navigationOptions = {
@@ -32,27 +81,27 @@ export default class CreateEvent extends Component {
                     <TextInput 
                         style={styles.formInput}
                         placeholder="Enter Title"
-                        onChangeText={(value) => this.onChangeText(value)}
+                        onChangeText={(value) => this.onChangeValue("title", value)}
                         //onSubmitEditing={this.onSubmit}
                     />
                     <TextInput 
                         style={styles.formInput}
                         placeholder="Enter Owner"
-                        onChangeText={(value) => this.onChangeText(value)}
+                        onChangeText={(value) => this.onChangeValue("owner", value)}
                         //onSubmitEditing={this.onSubmit}
                     />
                     <TextInput 
                         style={styles.formInput}
                         placeholder="Enter Number of Slots"
                         keyboardType = 'numeric'
-                        onChangeText={(value) => this.onChangeText(value)}
+                        onChangeText={(value) => this.onChangeValue("slots", value)}
                         //onSubmitEditing={this.onSubmit}
                     />
                     <TextInput 
                         style={styles.formInput}
                         placeholder="Enter Tags (Comma Separated)"
-                        onChangeText={(value) => this.onChangeText(value)}
-                        //onSubmitEditing={this.onSubmit}
+                        //onChangeText={(value) => this.onChangeValue("tags", value)}
+                        onSubmitEditing={(value) => this.onSubmitTag(value)}
                     />
                     <Button 
                         style={styles.eventsButton} 

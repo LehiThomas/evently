@@ -37,10 +37,6 @@ export default class Events extends Component {
     onPress(event){
         console.log(event);
         const { navigate } = this.props.navigation;
-        //this.props.navigator.push({
-           // id: 'component6',
-           // event: event
-        //});
         navigate('EventDetails', { event: event } );
     }
 
