@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {AppRegistry, Text, View, StyleSheet, TextInput, Button, TouchableOpacity} from 'react-native';
-
+import {AppRegistry, Text, View, StyleSheet, TextInput, Button, TouchableOpacity, Keyboard} from 'react-native';
+import axios from 'axios';
 
 export default class CreateEvent extends Component {
     constructor() {
@@ -8,17 +8,23 @@ export default class CreateEvent extends Component {
         this.state={
             title: "",
 	        slots: 0,
-	        startTime: 0,
+	        startTime: 123456789,
 	        tags: [],
 	        owner: "",
 	        id: 0
         };
     }
 
-    onChangeValue(value){
-        this.setState({
-            textValue:value
-        });
+    onChangeValue(field, value){
+        if (field === "slots") {
+	    	this.setState({
+	            slots: parseInt(value)
+            });
+        } else {
+            this.setState({
+                [field]:value
+            });
+        }
     }
 
     createTags(tagsString){
@@ -35,12 +41,14 @@ export default class CreateEvent extends Component {
 	}
 
     onSubmit(){
+        Keyboard.dismiss();
         console.log("Submitted");
+        console.log(this.state);
         const { navigate } = this.props.navigation;
         const config = {
             headers: {'Content-Type': 'application/json'}
           };
-        axios.post(`${URL_API}/events`, {
+        axios.post('http://45.55.247.237:3003/events', {
                     "title": this.state.title,
                     "slots": this.state.slots,
                     "startTime": this.state.startTime,
@@ -52,7 +60,7 @@ export default class CreateEvent extends Component {
                     }
           }, config )
           .then( response => {
-              console.log(response);
+              console.log("RESPONSE: ", response);
               this.setState({ id: response.data._id });
           })
           .catch( error => {
@@ -82,7 +90,7 @@ export default class CreateEvent extends Component {
                         style={styles.formInput}
                         placeholder="Enter Title"
                         onChangeText={(value) => this.onChangeValue("title", value)}
-                        //onSubmitEditing={this.onSubmit}
+                        //onSubmitEditing={(value) => this.onChangeValue("title", value)}
                     />
                     <TextInput 
                         style={styles.formInput}
@@ -90,7 +98,7 @@ export default class CreateEvent extends Component {
                         onChangeText={(value) => this.onChangeValue("owner", value)}
                         //onSubmitEditing={this.onSubmit}
                     />
-                    <TextInput 
+                    <TextInput
                         style={styles.formInput}
                         placeholder="Enter Number of Slots"
                         keyboardType = 'numeric'
