@@ -10,12 +10,8 @@
     "axios": "^0.16.2",
     "react": "16.0.0-alpha.12",
     "react-native": "0.48.4",
-<<<<<<< HEAD
-    "react-navigation": "^1.0.0-beta.13"
-=======
     "react-navigation": "^1.0.0-beta.11",
     "axios": "^0.16.2"
->>>>>>> cdb36db7cb8c49310c2131cf3d6be441868a5d28
   },
   "devDependencies": {
     "babel-jest": "21.0.2",
